@@ -1,0 +1,16 @@
+domain: infinitefun.cn
+layout:
+- go.kubebuilder.io/v3
+projectName: web-operator
+repo: vm-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: infinitefun.cn
+  group: mobfun
+  kind: WebApp
+  path: vm-operator/api/v1
+  version: v1
+version: "3"

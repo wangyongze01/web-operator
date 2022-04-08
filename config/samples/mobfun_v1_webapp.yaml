@@ -1,0 +1,21 @@
+apiVersion: mobfun.infinitefun.cn/v1
+kind: WebApp
+metadata:
+  name: webapp-sample
+spec:
+  replicas: 2
+  image: data.process.com:28080/public/transmission-resource-platform:20220407133556
+  env:
+    - name: LOCAL_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+  hostPathMount:
+#    - spath: /data
+#      dpath: /data
+    - spath: /data1
+      dpath: /data1
+  hostBinding:
+    - node-10-170-66-25
+  hostName: www.mobfunv1.com
+  contextPath: /fff

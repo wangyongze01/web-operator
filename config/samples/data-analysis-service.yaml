@@ -1,0 +1,23 @@
+apiVersion: mobfun.infinitefun.cn/v1
+kind: WebApp
+metadata:
+  name: data-analysis-service
+spec:
+  replicas: 2
+  image: data.process.com:28080/public/data-analysis-service:20220408115751
+  env:
+    - name: LOCAL_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+    - name: APPYAML
+      value: metadata,hw-xml,hw-corba,hw-rest,zte-corba,zte-xml,fh-corba,fh-xml,br-rest,mf,data_type-csv,namespace,hw-ftp,kra-corba,pro
+  hostPathMount:
+    - spath: /data10
+      dpath: /data1
+    - spath: /data
+      dpath: /data2
+  hostBinding:
+    - node-10-170-66-25
+  hostName: www.mobfun.com
+  contextPath: /data-analysis

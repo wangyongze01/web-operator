@@ -1,0 +1,19 @@
+apiVersion: mobfun.infinitefun.cn/v1
+kind: WebApp
+metadata:
+  name: unified-resource
+spec:
+  replicas: 2
+  image: data.process.com:28080/public/unified-resource:20220408115805
+  env:
+    - name: LOCAL_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+    - name: APPYAML
+      value: pro,clickhouse_pro
+  hostPathMount:
+    - spath: /data
+      dpath: /data2
+  hostName: www.mobfun.com
+  contextPath: /unified-resource

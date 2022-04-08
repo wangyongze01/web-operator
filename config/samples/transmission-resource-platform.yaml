@@ -1,0 +1,21 @@
+apiVersion: mobfun.infinitefun.cn/v1
+kind: WebApp
+metadata:
+  name: transmission-resource-platform
+spec:
+  replicas: 1
+  image: data.process.com:28080/public/transmission-resource-platform:20220408115728
+  env:
+    - name: LOCAL_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+  hostPathMount:
+    - spath: /data10
+      dpath: /data1
+    - spath: /data
+      dpath: /data2
+  hostBinding:
+    - node-10-170-66-25
+  hostName: www.mobfun.com
+  contextPath: /transmission-platform

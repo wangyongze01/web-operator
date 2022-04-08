@@ -1,0 +1,19 @@
+apiVersion: mobfun.infinitefun.cn/v1
+kind: WebApp
+metadata:
+  name: data-processing
+spec:
+  replicas: 1
+  image: data.process.com:28080/public/data-processing:20220408115824
+  env:
+    - name: LOCAL_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+    - name: APPYAML
+      value: pro
+  hostPathMount:
+    - spath: /data
+      dpath: /data2
+  hostName: www.mobfun.com
+  contextPath: /cascade-platform
