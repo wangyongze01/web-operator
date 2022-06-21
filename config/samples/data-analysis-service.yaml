@@ -3,8 +3,8 @@ kind: WebApp
 metadata:
   name: data-analysis-service
 spec:
-  replicas: 2
-  image: data.process.com:28080/public/data-analysis-service:20220408115751
+  replicas: 3
+  image: data.process.com:28080/public/data-analysis-service:20220410194105
   env:
     - name: LOCAL_IP
       valueFrom:
@@ -12,6 +12,10 @@ spec:
           fieldPath: status.podIP
     - name: APPYAML
       value: metadata,hw-xml,hw-corba,hw-rest,zte-corba,zte-xml,fh-corba,fh-xml,br-rest,mf,data_type-csv,namespace,hw-ftp,kra-corba,pro
+    - name: EUREKA_HOST
+      value: eureka-server.default.svc.cluster.local
+    - name: EUREKA_PORT
+      value: "8080"
   hostPathMount:
     - spath: /data10
       dpath: /data1
@@ -21,3 +25,28 @@ spec:
     - node-10-170-66-25
   hostName: www.mobfun.com
   contextPath: /data-analysis
+  promTail:
+    image: data.process.com:28080/monitor/promtail:2.4.2
+    promtailYml: |
+      server:
+        http_listen_port: 9080
+        grpc_listen_port: 0
+        grpc_server_max_recv_msg_size: 15728640
+        grpc_server_max_send_msg_size: 15728640
+
+      positions:
+        filename: /data/promtail/positions.yaml # This location needs to be writeable by promtail.
+
+      client:
+        url: http://monitor-processing-loki-svc.monitor.svc.cluster.local:3100/loki/api/v1/push
+
+
+      scrape_configs:
+        - job_name: planning
+          pipeline_stages:
+          static_configs:
+            - targets:
+                - localhost
+              labels:
+                project: data-analysis
+                __path__: /data/logs/data-analysis-platform/data-analysis*

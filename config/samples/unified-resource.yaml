@@ -3,8 +3,8 @@ kind: WebApp
 metadata:
   name: unified-resource
 spec:
-  replicas: 2
-  image: data.process.com:28080/public/unified-resource:20220408115805
+  replicas: 3
+  image: data.process.com:28080/public/unified-resource:20220410194118
   env:
     - name: LOCAL_IP
       valueFrom:
@@ -12,8 +12,37 @@ spec:
           fieldPath: status.podIP
     - name: APPYAML
       value: pro,clickhouse_pro
+    - name: EUREKA_HOST
+      value: eureka-server.default.svc.cluster.local
+    - name: EUREKA_PORT
+      value: "8080"
   hostPathMount:
     - spath: /data
       dpath: /data2
   hostName: www.mobfun.com
   contextPath: /unified-resource
+  promTail:
+    image: data.process.com:28080/monitor/promtail:2.4.2
+    promtailYml: |
+      server:
+        http_listen_port: 9080
+        grpc_listen_port: 0
+        grpc_server_max_recv_msg_size: 15728640
+        grpc_server_max_send_msg_size: 15728640
+
+      positions:
+        filename: /data/promtail/positions.yaml # This location needs to be writeable by promtail.
+
+      client:
+        url: http://monitor-processing-loki-svc.monitor.svc.cluster.local:3100/loki/api/v1/push
+
+
+      scrape_configs:
+        - job_name: planning
+          pipeline_stages:
+          static_configs:
+            - targets:
+                - localhost
+              labels:
+                project: unified-resource
+                __path__: /data/logs/unified-resource/unified-resource*

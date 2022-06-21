@@ -1,0 +1,9 @@
+apiVersion: mobfun.infinitefun.cn/v1
+kind: WebApp
+metadata:
+  name: eureka-server
+spec:
+  replicas: 1
+  image: data.process.com:28080/public/eureka-server:20220601184002
+  hostName: zq.eureka.com
+  contextPath: /

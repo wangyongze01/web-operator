@@ -4,12 +4,16 @@ metadata:
   name: transmission-resource-platform
 spec:
   replicas: 1
-  image: data.process.com:28080/public/transmission-resource-platform:20220408115728
+  image: data.process.com:28080/public/transmission-resource-platform:20220410194048
   env:
     - name: LOCAL_IP
       valueFrom:
         fieldRef:
           fieldPath: status.podIP
+    - name: EUREKA_HOST
+      value: eureka-server.default.svc.cluster.local
+    - name: EUREKA_PORT
+      value: "8080"
   hostPathMount:
     - spath: /data10
       dpath: /data1
@@ -19,3 +23,28 @@ spec:
     - node-10-170-66-25
   hostName: www.mobfun.com
   contextPath: /transmission-platform
+  promTail:
+    image: data.process.com:28080/monitor/promtail:2.4.2
+    promtailYml: |
+      server:
+        http_listen_port: 9080
+        grpc_listen_port: 0
+        grpc_server_max_recv_msg_size: 15728640
+        grpc_server_max_send_msg_size: 15728640
+
+      positions:
+        filename: /data/transmission-platformpromtail/positions.yaml # This location needs to be writeable by promtail.
+
+      client:
+        url: http://monitor-processing-loki-svc.monitor.svc.cluster.local:3100/loki/api/v1/push
+
+
+      scrape_configs:
+        - job_name: planning
+          pipeline_stages:
+          static_configs:
+            - targets:
+                - localhost
+              labels:
+                project: transmission-platform
+                __path__: /data/logs/platform/platform*

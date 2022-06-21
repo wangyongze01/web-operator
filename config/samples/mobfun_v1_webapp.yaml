@@ -19,3 +19,29 @@ spec:
     - node-10-170-66-25
   hostName: www.mobfunv1.com
   contextPath: /fff
+  promTail:
+    image:
+    PromtailYml: |
+      server:
+        http_listen_port: 9080
+        grpc_listen_port: 0
+        grpc_server_max_recv_msg_size: 15728640
+        grpc_server_max_send_msg_size: 15728640
+
+      positions:
+        filename: /planning-data/promtail/positions.yaml # This location needs to be writeable by promtail.
+
+      client:
+        url: http://loki01.prometheus.svc.cluster.local:3100/loki/api/v1/push
+
+
+      scrape_configs:
+        - job_name: planning
+          pipeline_stages:
+          static_configs:
+            - targets:
+                - localhost
+              labels:
+                job: planning
+                host: 192.168.12.7
+                __path__: /planning-data/pre-planning*
