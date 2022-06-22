@@ -19,6 +19,7 @@ package v1
 import (
 	core1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"reflect"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -37,9 +38,21 @@ type WebAppSpec struct {
 	HostBinding   []string              `json:"hostBinding,omitempty"`
 	HostName      string                `json:"hostName"`
 	ContextPath   string                `json:"contextPath"`
+	Promtail      PromtailConfig        `json:"promTail,omitempty"`
+}
+
+type PromtailConfig struct {
+	Image       string `json:"image,omitempty"`
+	PromtailYml string `json:"promtailYml"`
+}
+
+func (s PromtailConfig) IsEmpty() bool {
+	return reflect.DeepEqual(s, PromtailConfig{})
 }
 
 type HostPathMountConfig struct {
+	//挂载简洁
+	DescribePath string `json:"describePath"`
 	//容器路径
 	Spath string `json:"spath,omitempty"`
 	//服务器路径

@@ -158,16 +158,30 @@ spec:
               hostPathMount:
                 items:
                   properties:
+                    describePath:
+                      description: 挂载简洁
+                      type: string
                     dpath:
                       description: 服务器路径
                       type: string
                     spath:
                       description: 容器路径
                       type: string
+                  required:
+                  - describePath
                   type: object
                 type: array
               image:
                 type: string
+              promTail:
+                properties:
+                  image:
+                    type: string
+                  promtailYml:
+                    type: string
+                required:
+                - promtailYml
+                type: object
               replicas:
                 description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
                   Important: Run "make" to regenerate code after modifying this file'

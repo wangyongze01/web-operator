@@ -55,12 +55,15 @@ func (r *WebAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	var webapp mobfunv1.WebApp
 	err := r.Get(ctx, req.NamespacedName, &webapp)
 	if err != nil {
+		//如果忽略调没找到资源的错误还是有错误就说明程序报错，直接返回错误
 		if client.IgnoreNotFound(err) != nil {
 			return ctrl.Result{}, err
 		}
+		//否则证明是没找到资源的错误，说明资源可能被删了  直接返回
 		return ctrl.Result{}, nil
 	}
 
+	//如果没有错误证明成功获取到了资源，走下面逻辑创建或者更新
 	service := &corev1.Service{}
 
 	err = r.Get(ctx, req.NamespacedName, service)
@@ -83,6 +86,11 @@ func (r *WebAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	}
 
 	err = createIngess(ctx, r, &webapp, req)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = newPrometailDaemonSet(ctx, r, &webapp, req)
 	if err != nil {
 		return ctrl.Result{}, err
 	}

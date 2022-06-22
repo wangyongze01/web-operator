@@ -13,4 +13,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: data.process.com:28080/operator/webapp
-  newTag: v2
+  newTag: v9

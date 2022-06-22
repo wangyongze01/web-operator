@@ -1,0 +1,49 @@
+apiVersion: mobfun.infinitefun.cn/v1
+kind: WebApp
+metadata:
+  name: dame
+spec:
+  replicas: 2
+  image: dame:20220622153418
+  env:
+    - name: LOCAL_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+    - name: APPYAML
+      value: pro
+  hostPathMount:
+    - spath: /data
+      dpath: /data2
+      describePath: 日志
+  hostBinding:
+    - node-192-168-1-133
+  hostName: www.dame.com
+  contextPath: /dame
+  #添加日志采集功能需要在集群创建"promtail"namespace
+  promTail:
+    image: grafana/promtail:2.4.2
+    promtailYml: |
+      server:
+        http_listen_port: 9080
+        grpc_listen_port: 0
+        grpc_server_max_recv_msg_size: 15728640
+        grpc_server_max_send_msg_size: 15728640
+
+      positions:
+        filename: /data/promtail/positions.yaml # This location needs to be writeable by promtail.
+
+      client:
+        url: http://monitor-processing-loki-svc.monitor.svc.cluster.local:3100/loki/api/v1/push
+
+
+      scrape_configs:
+        - job_name: planning
+          pipeline_stages:
+          static_configs:
+            - targets:
+                - localhost
+              labels:
+                project: xxxproject
+                namespace: xxxnamespace
+                __path__: xxxpath
